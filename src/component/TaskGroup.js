@@ -7,15 +7,23 @@ export default class Task extends Component {
     this.state = { editable: false };
   }
   editTask = e => {
-    //this.setState({editable:true});
-    console.log("editTask");
+    let task = e.target;
+    task.contentEditable = "true";
+    task.focus();
   };
   endEdit = event => {
-    let keycode = event.keyCode;
-    if (keycode === "13") {
-      this.setState({ editable: false });
+    let keycode = event.key;
+    if (keycode == "Enter") {
+      const taskId = event.target.previousSibling.id;
+      const task = this.props.tasks.find(t => {
+        return t.id == taskId;
+      });
+      task.text = event.target.innerHTML;
+      this.props.check(this.props.tasks);
+      event.target.setAttribute("contentEditable", "false");
     }
   };
+
   checkTask = event => {
     const task = this.props.tasks.find(t => {
       return t.id == event.target.id;
@@ -36,7 +44,9 @@ export default class Task extends Component {
               checked={task.checked ? "checked" : ""}
               onClick={this.checkTask}
             />
-            <span>{task.text}</span>
+            <span onDoubleClick={this.editTask} onKeyPress={this.endEdit}>
+              {task.text}
+            </span>
           </li>
         ))}
       </ol>
